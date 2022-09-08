@@ -1,5 +1,10 @@
+import 'package:firebase/ui/auth/login_with_phone_number.dart';
 import 'package:firebase/ui/auth/sign_up.dart';
+import 'package:firebase/ui/posts/posts_screen.dart';
+import 'package:firebase/utils/utils.dart';
 import 'package:firebase/widget/round_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -11,9 +16,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool loading = false;
   final _formField = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  final _auth = FirebaseAuth.instance;
 
   @override
   void dispose() {
@@ -21,6 +29,26 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
     emailController.dispose();
     passwordController.dispose();
+  }
+
+  void login() {
+    _auth
+        .signInWithEmailAndPassword(
+            email: emailController.text.toString(),
+            password: passwordController.text.toString())
+        .then((value) {
+      Utils().toastMessage(value.user!.email.toString());
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => PostScreen()));
+      setState(() {
+        loading = false;
+      });
+    }).onError((error, stackTrace) {
+      Utils().toastMessage(error.toString());
+      setState(() {
+        loading = false;
+      });
+    });
   }
 
   @override
@@ -88,8 +116,14 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 50),
               RoundButton(
                 title: "Login",
+                loading: loading,
                 onTap: () {
-                  if (_formField.currentState!.validate()) {}
+                  if (_formField.currentState!.validate()) {
+                    setState(() {
+                      loading = true;
+                    });
+                    login();
+                  }
                 },
               ),
               SizedBox(height: 30),
@@ -106,7 +140,29 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: Text("Sign Up")),
                 ],
-              )
+              ),
+              SizedBox(height: 30),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginWithPhoneNumber()));
+                },
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(200),
+                      //color: Colors.deepPurple,
+                      border: Border.all(color: Colors.black)),
+                  child: Center(
+                    child: Text(
+                      "Login with Phone",
+                      //style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
