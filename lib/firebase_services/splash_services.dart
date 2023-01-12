@@ -2,6 +2,7 @@ import 'dart:async';
 //import 'dart:js';
 
 import 'package:firebase/ui/auth/login_screen.dart';
+import 'package:firebase/ui/firestore/firestore_list_screen.dart';
 import 'package:firebase/ui/posts/posts_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,8 +16,8 @@ class SplashServices {
     if (user != null) {
       Timer(
           Duration(seconds: 3),
-          () => Navigator.push(
-              context, MaterialPageRoute(builder: (context) => PostScreen())));
+          () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => FireStoreScreen())));
     } else {
       Timer(
           Duration(seconds: 3),
